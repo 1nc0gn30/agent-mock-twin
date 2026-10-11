@@ -23,6 +23,26 @@ from .parser import HarParser, OpenAPIParser, RecordedRoute, normalize_path
 from .storage import MockStorage
 
 
+def _is_local_origin(origin) -> bool:
+    """Browser Origin check. No Origin header = non-browser client (CLI/agent): allowed.
+    Otherwise only http(s)://localhost / 127.0.0.1 / [::1] pages may call this API, so a
+    random website can't drive the local server from the user's browser (CSRF)."""
+    if not origin:
+        return True
+    from urllib.parse import urlparse
+    try:
+        u = urlparse(origin)
+    except ValueError:
+        return False
+    return u.scheme in ("http", "https") and u.hostname in ("localhost", "127.0.0.1", "::1")
+
+
+def _cors_origin(handler) -> str:
+    origin = handler.headers.get("Origin")
+    return origin if origin and _is_local_origin(origin) else "http://127.0.0.1"
+
+
+
 class SSEBroadcaster:
     """Thread-safe SSE event broadcaster for live UI telemetry feed."""
 
@@ -60,7 +80,7 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         pass
 
     def _send_cors_headers(self) -> None:
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", _cors_origin(self))
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, anthropic-version")
         self.send_header("X-Frame-Options", "SAMEORIGIN")
@@ -125,6 +145,14 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self._handle_mock_request(method="GET", body="")
 
     def do_POST(self) -> None:
+        if not _is_local_origin(self.headers.get("Origin")):
+            _body = b'{"error": "cross-origin request blocked"}'
+            self.send_response(403)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(_body)))
+            self.end_headers()
+            self.wfile.write(_body)
+            return
         parsed_url = urlparse(self.path)
         path = parsed_url.path
 
@@ -155,14 +183,38 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self._handle_mock_request(method="POST", body=body_text)
 
     def do_PUT(self) -> None:
+        if not _is_local_origin(self.headers.get("Origin")):
+            _body = b'{"error": "cross-origin request blocked"}'
+            self.send_response(403)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(_body)))
+            self.end_headers()
+            self.wfile.write(_body)
+            return
         content_length = int(self.headers.get("Content-Length", 0))
         body_text = self.rfile.read(content_length).decode("utf-8", errors="replace") if content_length > 0 else ""
         self._handle_mock_request(method="PUT", body=body_text)
 
     def do_DELETE(self) -> None:
+        if not _is_local_origin(self.headers.get("Origin")):
+            _body = b'{"error": "cross-origin request blocked"}'
+            self.send_response(403)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(_body)))
+            self.end_headers()
+            self.wfile.write(_body)
+            return
         self._handle_mock_request(method="DELETE", body="")
 
     def do_PATCH(self) -> None:
+        if not _is_local_origin(self.headers.get("Origin")):
+            _body = b'{"error": "cross-origin request blocked"}'
+            self.send_response(403)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(_body)))
+            self.end_headers()
+            self.wfile.write(_body)
+            return
         content_length = int(self.headers.get("Content-Length", 0))
         body_text = self.rfile.read(content_length).decode("utf-8", errors="replace") if content_length > 0 else ""
         self._handle_mock_request(method="PATCH", body=body_text)
