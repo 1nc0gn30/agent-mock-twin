@@ -23,6 +23,17 @@ from .parser import HarParser, OpenAPIParser, RecordedRoute, normalize_path
 from .storage import MockStorage
 
 
+def _safe_rel(raw: str) -> str:
+    """Request path -> safe relative path inside a static dir; '' (index) if it
+    tries to climb out with '..' or is absolute. Raw request paths are not normalised."""
+    from urllib.parse import unquote
+    rel = unquote(str(raw or "")).replace("\\", "/").lstrip("/")
+    parts = [p for p in rel.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in parts) or ":" in (parts[0] if parts else ""):
+        return ""
+    return "/".join(parts)
+
+
 def _is_local_origin(origin) -> bool:
     """Browser Origin check. No Origin header = non-browser client (CLI/agent): allowed.
     Otherwise only http(s)://localhost / 127.0.0.1 / [::1] pages may call this API, so a
@@ -422,7 +433,7 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         if path in ("/", ""):
             file_path = os.path.join(public_dir, "index.html")
         else:
-            rel = path.lstrip("/")
+            rel = _safe_rel(path)
             file_path = os.path.join(public_dir, rel)
 
         if os.path.isfile(file_path):
