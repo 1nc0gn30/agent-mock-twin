@@ -581,7 +581,8 @@
     <div class="brand-title">
       <img src="/assets/icon.png" alt="Agent Mock Twin Brand Icon" style="width: 28px; height: 28px; border-radius: 6px;">
       <span>AGENT MOCK TWIN</span>
-      <span class="badge badge-free" id="licenseBadge">FREE TIER</span>
+      <span class="badge" style="background: rgba(212,175,55,0.15); color: var(--gold-glow); border: 1px solid rgba(212,175,55,0.3); font-size: 11px;">v2.5 SOVEREIGN</span>
+      <span class="badge badge-free" id="licenseBadge">⚡ FREE TIER</span>
     </div>
     
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
@@ -600,7 +601,7 @@
   <div class="container">
 
     <!-- High-Converting Sales Funnel Banner -->
-    <section class="sales-banner" aria-label="Founding Member Pricing">
+    <section class="sales-banner" id="salesBanner" aria-label="Founding Member Pricing">
       <div class="sales-banner-text">
         <h2><span>🪙</span> Autonomous Network Twin — Founding Lifetime Access</h2>
         <p>Run agent test suites in CI/CD without burning API credits. Zero external dependencies.</p>
@@ -920,7 +921,7 @@
   </footer>
 
   <!-- Pro Paywall Modal -->
-  <div class="modal-backdrop" id="proModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-backdrop" id="proModal" data-alias="licenseModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-box">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
         <h3 id="modalTitle" style="font-family: var(--font-display); font-size: 20px; color: var(--gold-glow);">
@@ -969,7 +970,7 @@
         <label for="licenseKeyInput" style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Already purchased? Enter receipt email or license key:</label>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="licenseKeyInput" placeholder="name@domain.com or AMT-PRO-XXXX" style="flex: 1; background: #050608; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px 12px; color: #FFF; font-family: var(--font-mono); font-size: 12px;">
-          <button type="button" id="btnActivateKey" class="btn btn-gold" onclick="activateWithKey()" style="min-height: 38px; padding: 6px 16px;">Activate</button>
+          <button type="button" id="btnActivateKey" data-alias="btnActivateKey" class="btn btn-gold" onclick="activateWithKey()" style="min-height: 38px; padding: 6px 16px;">Activate</button>
         </div>
       </div>
     </div>

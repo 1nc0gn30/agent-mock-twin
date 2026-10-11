@@ -82,16 +82,23 @@
   function checkLicenseStatus() {
     // 1. Check URL parameters for instant 1-click return from checkout
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('licensed') === 'true' || urlParams.get('pro') === 'true') {
+    if (urlParams.get('licensed') === 'true' || urlParams.get('pro') === 'true' || urlParams.get('session_id')) {
       localStorage.setItem('agent_mock_twin_pro', 'true');
+      localStorage.setItem('zoth_agent_mock_licensed', 'true');
+      localStorage.setItem('pro_licensed', 'true');
       const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
       enableProMode();
       showNotification('🎉 Welcome to Agent Mock Twin Pro! Unlimited offline mocking unlocked.');
+      return;
     }
 
     // 2. Check localStorage
-    if (localStorage.getItem('agent_mock_twin_pro') === 'true') {
+    if (
+      localStorage.getItem('agent_mock_twin_pro') === 'true' ||
+      localStorage.getItem('zoth_agent_mock_licensed') === 'true' ||
+      localStorage.getItem('pro_licensed') === 'true'
+    ) {
       enableProMode();
     }
   }
@@ -102,6 +109,10 @@
     if (badge) {
       badge.textContent = '⭐ PRO ACTIVE';
       badge.className = 'badge badge-pro-active';
+    }
+    const salesBanner = document.getElementById('salesBanner');
+    if (salesBanner) {
+      salesBanner.style.display = 'none';
     }
     const overlay = elPaywallOverlay || document.getElementById('paywallOverlay');
     if (overlay) {
@@ -114,7 +125,7 @@
     if (btnExport) {
       btnExport.onclick = () => {
         const bundle = {
-          generator: "Agent Mock Twin v1.0.0",
+          generator: "Agent Mock Twin v2.5.0",
           timestamp: new Date().toISOString(),
           routes: state.routes,
           dockerfile: "FROM python:3.12-alpine\nWORKDIR /app\nCOPY . /app\nEXPOSE 8097\nCMD [\"python\", \"-m\", \"agent_mock_twin\", \"serve\", \"--port\", \"8097\"]",
@@ -144,17 +155,26 @@
     if (modal) modal.classList.remove('active');
   };
 
+  window.activateLicenseKey = function (key) {
+    const k = (typeof key === 'string' && key) ? key : (document.getElementById('licenseKeyInput')?.value || '');
+    if (k.trim().length >= 4) {
+      localStorage.setItem('agent_mock_twin_pro', 'true');
+      localStorage.setItem('zoth_agent_mock_licensed', 'true');
+      localStorage.setItem('pro_licensed', 'true');
+      enableProMode();
+      window.closeProModal();
+      showNotification('⭐ License key verified! Pro capabilities active.');
+      return true;
+    } else {
+      showNotification('⚠️ Please enter a valid receipt email or license key.');
+      return false;
+    }
+  };
+
   window.activateWithKey = function () {
     const input = document.getElementById('licenseKeyInput');
     const val = input ? input.value.trim() : '';
-    if (val.length >= 4) {
-      localStorage.setItem('agent_mock_twin_pro', 'true');
-      enableProMode();
-      closeProModal();
-      showNotification('⭐ License key verified! Pro capabilities active.');
-    } else {
-      alert('Please enter a valid receipt email or license key.');
-    }
+    window.activateLicenseKey(val);
   };
 
   // Intercept Pro Actions
@@ -403,7 +423,7 @@
           imported = parseOpenApiClientSide(json);
           showNotification(`📘 Ingested ${imported.length} routes from OpenAPI specification.`);
         } else {
-          alert('Unrecognized format. Please provide a standard HAR 1.2 or OpenAPI 3.0 file.');
+          showNotification('⚠️ Unrecognized format. Please provide a standard HAR 1.2 or OpenAPI 3.0 file.');
           return;
         }
 
@@ -418,7 +438,7 @@
         }).catch(() => {});
 
       } catch (err) {
-        alert('Invalid JSON file. Please verify file integrity.');
+        showNotification('⚠️ Invalid JSON file. Please verify file integrity.');
       }
     };
     reader.readAsText(file);
