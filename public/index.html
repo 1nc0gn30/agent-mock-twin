@@ -6,12 +6,17 @@
   <title>AGENT MOCK TWIN — Autonomous Offline API Mock & Network Twin for AI Agents</title>
   <meta name="description" content="Autonomous offline API mock server and network twin for AI agents. Ingests HAR 1.2 and OpenAPI 3.0 to enable zero-latency, $0 token cost CI/CD test execution.">
   
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+  
   <!-- OpenGraph Metadata -->
   <meta property="og:title" content="AGENT MOCK TWIN — Autonomous Offline API Mock for AI Agents">
   <meta property="og:description" content="Run autonomous AI agents offline in CI/CD with $0 API token cost and 100% deterministic outputs. Zero-dependency Python standard library.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://agent-mock-twin.nullai.tech/">
-  <meta property="og:image" content="https://agent-mock-twin.nullai.tech/social-preview.png">
+  <meta property="og:url" content="https://agent-mock.nullai.tech/">
+  <meta property="og:image" content="https://agent-mock.nullai.tech/assets/banner.png">
   
   <!-- Twitter Card Metadata -->
   <meta name="twitter:card" content="summary_large_image">
@@ -19,7 +24,7 @@
   <meta name="twitter:creator" content="@1nc0gn30">
   <meta name="twitter:title" content="AGENT MOCK TWIN — $0 Token Cost Network Twin for AI Agents">
   <meta name="twitter:description" content="Autonomous offline API mock server and network twin for AI agents. Ingests HAR 1.2 and OpenAPI 3.0.">
-  <meta name="twitter:image" content="https://agent-mock-twin.nullai.tech/social-preview.png">
+  <meta name="twitter:image" content="https://agent-mock.nullai.tech/assets/banner.png">
 
   <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -574,7 +579,7 @@
   <!-- Top Global Navigation Bar -->
   <header>
     <div class="brand-title">
-      <span style="font-size: 22px;">⚡</span>
+      <img src="/assets/icon.png" alt="Agent Mock Twin Brand Icon" style="width: 28px; height: 28px; border-radius: 6px;">
       <span>AGENT MOCK TWIN</span>
       <span class="badge badge-free" id="licenseBadge">FREE TIER</span>
     </div>
@@ -611,6 +616,9 @@
         </a>
         <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()">
           <span>◎</span> Pay with Solana ($19)
+        </button>
+        <button type="button" class="btn btn-outline" id="btnActivateBanner" onclick="openProModal()" style="min-height: 44px;">
+          <span>🔑</span> Activate Key
         </button>
       </div>
     </section>
@@ -801,6 +809,21 @@
 
     </section>
 
+    <!-- Pro Actions Interceptor Bar (Outside Blur) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+      <div style="font-weight: 700; font-size: 14px; color: var(--gold-glow); display: flex; align-items: center; gap: 8px;">
+        <span>⚡</span> Enterprise CI/CD & Chaos Suite
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline" id="btnExportDockerLive" onclick="openProModal()" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
+          <span>📦</span> Export CI Docker Container
+        </button>
+        <button type="button" class="btn btn-outline" id="btnChaosTriggerLive" onclick="openProModal()" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
+          <span>⚡</span> Simulate 503 Outage
+        </button>
+      </div>
+    </div>
+
     <!-- Frosted Glass Output Paywall: Advanced Chaos & Jitter Engine -->
     <section class="paywall-wrapper glass-card" style="margin-bottom: 40px; padding: 0;">
       
@@ -848,7 +871,7 @@
           <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()">
             <span>◎</span> Unlock via Solana ($19)
           </button>
-          <button type="button" class="btn btn-outline" onclick="openProModal()">
+          <button type="button" class="btn btn-outline" id="btnKeyOverlay" onclick="openProModal()">
             <span>🔑</span> Enter Key / Email
           </button>
         </div>
@@ -903,7 +926,7 @@
         <h3 id="modalTitle" style="font-family: var(--font-display); font-size: 20px; color: var(--gold-glow);">
           ⭐ Unlock Agent Mock Twin Pro
         </h3>
-        <button type="button" onclick="closeProModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+        <button type="button" id="closeProModal" onclick="closeProModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
       <p style="font-size: 13px; color: #D1D5DB; margin-bottom: 16px;">
@@ -946,7 +969,7 @@
         <label for="licenseKeyInput" style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Already purchased? Enter receipt email or license key:</label>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="licenseKeyInput" placeholder="name@domain.com or AMT-PRO-XXXX" style="flex: 1; background: #050608; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px 12px; color: #FFF; font-family: var(--font-mono); font-size: 12px;">
-          <button type="button" class="btn btn-gold" onclick="activateWithKey()" style="min-height: 38px; padding: 6px 16px;">Activate</button>
+          <button type="button" id="btnActivateKey" class="btn btn-gold" onclick="activateWithKey()" style="min-height: 38px; padding: 6px 16px;">Activate</button>
         </div>
       </div>
     </div>
@@ -955,28 +978,30 @@
   <!-- DePay Solana Payment Handler -->
   <script>
     function startDePaySolanaPayment() {
-      if (typeof DePayButtons !== 'undefined') {
-        DePayButtons.init({
-          document: document,
-          integration: '428790dd-7ad1-407c-8ecf-c048c77a4cb8',
-          accept: [
-            {
-              blockchain: 'solana',
-              token: '11111111111111111111111111111111',
-              receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK'
-            },
-            {
-              blockchain: 'solana',
-              token: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
-              receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK'
-            }
-          ],
-          amount: { currency: 'USD', fix: 19.00 }
-        });
-      } else {
-        // Fallback to direct Solana address prompt if script blocked
-        prompt('Send 0.12 SOL ($19 USD) to sovereign receiver:', 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK');
+      if (window.DePay && window.DePay.Payment) {
+        try {
+          window.DePay.Payment({
+            accept: [
+              {
+                blockchain: 'solana',
+                token: '11111111111111111111111111111111',
+                receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK',
+                amount: 19
+              },
+              {
+                blockchain: 'solana',
+                token: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+                receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK',
+                amount: 19
+              }
+            ]
+          });
+          return;
+        } catch (err) {
+          console.warn('DePay widget fallback:', err);
+        }
       }
+      window.open('https://depay.com/pay?integration=428790dd-7ad1-407c-8ecf-c048c77a4cb8&receiver=GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK&amount=19', '_blank');
     }
   </script>
 

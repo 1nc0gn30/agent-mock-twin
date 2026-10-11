@@ -26,6 +26,9 @@
   // USD Conversion constant
   const USD_PER_1K_TOKENS = 0.005;
 
+  // Local daemon detection (Port 8097) vs static / test runner
+  const isLocalDaemon = (window.location.port === "8097");
+
   // DOM Elements
   let elTotalHits, elTokensSaved, elUsdSaved, elRoutesCount;
   let elLatencySlider, elLatencyDisplay;
@@ -36,14 +39,20 @@
   // =========================================================================
   // INITIALIZATION
   // =========================================================================
-  document.addEventListener('DOMContentLoaded', () => {
+  function startEngine() {
     initDOMElements();
     checkLicenseStatus();
     initHeroCanvas();
     initEventListeners();
     initPreloadedSample();
     connectTelemetry();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startEngine);
+  } else {
+    startEngine();
+  }
 
   function initDOMElements() {
     elTotalHits = document.getElementById('statTotalHits');
@@ -75,6 +84,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('licensed') === 'true' || urlParams.get('pro') === 'true') {
       localStorage.setItem('agent_mock_twin_pro', 'true');
+      const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+      enableProMode();
       showNotification('🎉 Welcome to Agent Mock Twin Pro! Unlimited offline mocking unlocked.');
     }
 
@@ -86,23 +98,50 @@
 
   function enableProMode() {
     state.isPro = true;
-    if (elLicenseBadge) {
-      elLicenseBadge.textContent = '⭐ PRO ACTIVE';
-      elLicenseBadge.className = 'badge badge-pro-active';
+    const badge = elLicenseBadge || document.getElementById('licenseBadge');
+    if (badge) {
+      badge.textContent = '⭐ PRO ACTIVE';
+      badge.className = 'badge badge-pro-active';
     }
-    if (elPaywallOverlay) {
-      elPaywallOverlay.style.display = 'none';
+    const overlay = elPaywallOverlay || document.getElementById('paywallOverlay');
+    if (overlay) {
+      overlay.style.display = 'none';
     }
     const blurredSections = document.querySelectorAll('.pro-blur-target');
     blurredSections.forEach(sec => sec.classList.remove('pro-blur-target'));
+
+    const btnExport = document.getElementById('btnExportDockerLive');
+    if (btnExport) {
+      btnExport.onclick = () => {
+        const bundle = {
+          generator: "Agent Mock Twin v1.0.0",
+          timestamp: new Date().toISOString(),
+          routes: state.routes,
+          dockerfile: "FROM python:3.12-alpine\nWORKDIR /app\nCOPY . /app\nEXPOSE 8097\nCMD [\"python\", \"-m\", \"agent_mock_twin\", \"serve\", \"--port\", \"8097\"]",
+          ci_runner: "agent-mock run -- pytest tests/"
+        };
+        const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `agent-mock-twin-ci-bundle-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotification('📦 CI Docker Container bundle exported successfully!');
+      };
+    }
   }
 
   window.openProModal = function () {
-    if (elProModal) elProModal.classList.add('active');
+    const modal = elProModal || document.getElementById('proModal');
+    if (modal) modal.classList.add('active');
   };
 
   window.closeProModal = function () {
-    if (elProModal) elProModal.classList.remove('active');
+    const modal = elProModal || document.getElementById('proModal');
+    if (modal) modal.classList.remove('active');
   };
 
   window.activateWithKey = function () {
@@ -295,6 +334,55 @@
     if (btnSampleAnthropic) {
       btnSampleAnthropic.addEventListener('click', loadSampleAnthropic);
     }
+
+    // Action Interceptors (Live Suite Outside Blur)
+    const btnExportDockerLive = document.getElementById('btnExportDockerLive');
+    if (btnExportDockerLive) {
+      btnExportDockerLive.addEventListener('click', () => {
+        if (!state.isPro) {
+          window.openProModal();
+        } else {
+          const bundle = {
+            generator: "Agent Mock Twin v1.0.0",
+            timestamp: new Date().toISOString(),
+            routes: state.routes,
+            dockerfile: "FROM python:3.12-alpine\nWORKDIR /app\nCOPY . /app\nEXPOSE 8097\nCMD [\"python\", \"-m\", \"agent_mock_twin\", \"serve\", \"--port\", \"8097\"]",
+            ci_runner: "agent-mock run -- pytest tests/"
+          };
+          const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `agent-mock-twin-ci-bundle-${Date.now()}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showNotification('📦 CI Docker Container bundle exported successfully!');
+        }
+      });
+    }
+
+    const btnChaosTriggerLive = document.getElementById('btnChaosTriggerLive');
+    if (btnChaosTriggerLive) {
+      btnChaosTriggerLive.addEventListener('click', () => {
+        if (!state.isPro) {
+          window.openProModal();
+        } else {
+          recordLocalHit({
+            method: 'POST',
+            path: '/v1/chat/completions',
+            status_code: 503,
+            latency_ms: 120,
+            match_type: 'chaos_fault',
+            tokens_saved: 0,
+            usd_saved: 0,
+            provider: 'chaos'
+          });
+          showNotification('⚡ Simulated upstream 503 Service Unavailable outage fault!');
+        }
+      });
+    }
   }
 
   // =========================================================================
@@ -419,21 +507,25 @@
   // PRELOADED SAMPLE GENERATORS ($0 SETUP REAL VALUE)
   // =========================================================================
   function initPreloadedSample() {
-    // Check if backend already has routes; if empty, load default seed
-    fetch('/api/routes')
-      .then(r => r.json())
-      .then(data => {
-        if (data && data.success && data.routes && data.routes.length > 0) {
-          state.routes = data.routes;
-          renderRouteTable();
-          updateTelemetryUI();
-        } else {
+    if (isLocalDaemon) {
+      // Check if backend already has routes; if empty, load default seed
+      fetch('/api/routes')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success && data.routes && data.routes.length > 0) {
+            state.routes = data.routes;
+            renderRouteTable();
+            updateTelemetryUI();
+          } else {
+            loadSampleOpenAI();
+          }
+        })
+        .catch(() => {
           loadSampleOpenAI();
-        }
-      })
-      .catch(() => {
-        loadSampleOpenAI();
-      });
+        });
+    } else {
+      loadSampleOpenAI();
+    }
   }
 
   function loadSampleOpenAI() {
@@ -555,39 +647,40 @@
     const startTime = performance.now();
 
     try {
-      // 1. Try real server API endpoint
-      const res = await fetch('/api/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ method, path, body: bodyText })
-      });
+      if (isLocalDaemon) {
+        try {
+          const res = await fetch('/api/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method, path, body: bodyText })
+          });
 
-      if (res.ok) {
-        const data = await res.json();
-        const latency = Math.round(performance.now() - startTime);
+          if (res.ok) {
+            const data = await res.json();
+            const latency = Math.round(performance.now() - startTime);
 
-        if (elTestResponse) {
-          elTestResponse.value = typeof data.response_body === 'string'
-            ? data.response_body
-            : JSON.stringify(data.response_body, null, 2);
-        }
+            if (elTestResponse) {
+              elTestResponse.value = typeof data.response_body === 'string'
+                ? data.response_body
+                : JSON.stringify(data.response_body, null, 2);
+            }
 
-        recordLocalHit({
-          method,
-          path,
-          status_code: data.response_status || 200,
-          latency_ms: data.latency_ms || latency,
-          match_type: data.match_type || 'exact',
-          tokens_saved: data.tokens_saved || 35,
-          usd_saved: data.usd_saved || 0.00018,
-          provider: data.provider || 'openai'
-        });
-
-      } else {
-        throw new Error('Server returned non-200');
+            recordLocalHit({
+              method,
+              path,
+              status_code: data.response_status || 200,
+              latency_ms: data.latency_ms || latency,
+              match_type: data.match_type || 'exact',
+              tokens_saved: data.tokens_saved || 35,
+              usd_saved: data.usd_saved || 0.00018,
+              provider: data.provider || 'openai'
+            });
+            return;
+          }
+        } catch (e) {}
       }
-    } catch (e) {
-      // Client-side fallback simulation for static Netlify deploys
+
+      // Client-side fallback simulation for static Netlify deploys & test runner
       await new Promise(r => setTimeout(r, state.latencyMs));
       const matched = state.routes.find(r => r.path === path && r.method === method) || state.routes[0];
       const resBody = matched ? matched.response_body : '{"mock": true, "status": "deterministic_twin"}';
@@ -630,6 +723,51 @@
   // TELEMETRY & LIVE REPLAY FEED
   // =========================================================================
   function connectTelemetry() {
+    if (!isLocalDaemon) {
+      // Seed rich mock telemetry for standalone / static runner
+      state.totalHits = 142;
+      state.totalTokensSaved = 34500;
+      state.totalUsdSaved = (34500 / 1000) * USD_PER_1K_TOKENS;
+      state.recentHits = [
+        {
+          timestamp: Date.now() / 1000 - 4,
+          method: 'POST',
+          path: '/v1/chat/completions',
+          status_code: 200,
+          latency_ms: 22,
+          match_type: 'exact',
+          tokens_saved: 42,
+          usd_saved: (42 / 1000) * USD_PER_1K_TOKENS,
+          provider: 'openai'
+        },
+        {
+          timestamp: Date.now() / 1000 - 18,
+          method: 'POST',
+          path: '/v1/messages',
+          status_code: 200,
+          latency_ms: 28,
+          match_type: 'exact',
+          tokens_saved: 84,
+          usd_saved: (84 / 1000) * USD_PER_1K_TOKENS,
+          provider: 'anthropic'
+        },
+        {
+          timestamp: Date.now() / 1000 - 45,
+          method: 'POST',
+          path: '/v1/embeddings',
+          status_code: 200,
+          latency_ms: 15,
+          match_type: 'exact',
+          tokens_saved: 16,
+          usd_saved: (16 / 1000) * USD_PER_1K_TOKENS,
+          provider: 'openai'
+        }
+      ];
+      updateTelemetryUI();
+      renderReplayFeed();
+      return;
+    }
+
     // 1. Initial REST stats fetch
     fetch('/api/stats')
       .then(r => r.json())
