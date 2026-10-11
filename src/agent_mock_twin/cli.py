@@ -19,6 +19,24 @@ from .parser import HarParser, OpenAPIParser
 from .storage import MockStorage
 
 
+def _default_bind_host() -> str:
+    """Bind address: localhost unless explicitly opted in via $ZOTH_BIND_HOST or
+    $HOST (IP literal only; zsh sets HOST to the hostname) or --host."""
+    import ipaddress, os
+    for var in ("ZOTH_BIND_HOST", "HOST"):
+        val = os.environ.get(var, "").strip()
+        if val == "localhost":
+            return "127.0.0.1"
+        if val:
+            try:
+                ipaddress.ip_address(val)
+                return val
+            except ValueError:
+                pass
+    return "127.0.0.1"
+
+
+
 def parse_data_file(file_path: str, storage: MockStorage) -> int:
     """Detect format and import HAR or OpenAPI file into storage."""
     if not os.path.isfile(file_path):
@@ -226,7 +244,7 @@ def main() -> None:
 
     # serve command
     p_serve = subparsers.add_parser("serve", help="Start offline mock server and web dashboard")
-    p_serve.add_argument("--host", default="0.0.0.0", help="Host address to bind (default: 0.0.0.0)")
+    p_serve.add_argument("--host", default=_default_bind_host(), help="Host interface (default: 127.0.0.1 or $ZOTH_BIND_HOST; use 0.0.0.0 only on trusted networks)")
     p_serve.add_argument("--port", type=int, default=8097, help="Port to listen on (default: 8097)")
     p_serve.add_argument("--data", help="Path to initial HAR or OpenAPI file to load")
     p_serve.add_argument("--db", default="agent_mock.db", help="Path to SQLite database")

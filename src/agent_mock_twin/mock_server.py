@@ -428,7 +428,7 @@ class MockServer(http.server.ThreadingHTTPServer):
 
     def __init__(
         self,
-        host: str = "0.0.0.0",
+        host: str = "127.0.0.1",
         port: int = 8097,
         db_path: str = "agent_mock.db",
         public_dir: Optional[str] = None,
