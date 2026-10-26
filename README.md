@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="assets/hero-banner.svg" alt="Agent Mock Twin — Sovereign Architecture Banner" width="100%" />
+</div>
+
+<br />
+
 # AGENT MOCK TWIN ⚡
 
 > **Autonomous Offline API Mock & Network Twin for AI Agents**  
