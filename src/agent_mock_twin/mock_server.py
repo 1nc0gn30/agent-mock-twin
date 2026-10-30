@@ -118,6 +118,20 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         query = parse_qs(parsed_url.query)
 
         # 1. API: Server Telemetry & Management Routes
+        if path in ("/health", "/api/health", "/status", "/api/status"):
+            stats = self.server.storage.get_stats()
+            self._send_json(200, {
+                "status": "ok",
+                "service": "agent-mock-twin",
+                "version": "2.5.0",
+                "port": self.server.port,
+                "routes_count": stats.get("total_routes", 0),
+                "total_hits": stats.get("total_hits", 0),
+                "saved_dollars": stats.get("saved_dollars", 0.0),
+                "license": "100% Free & Open Access (Zero Paywalls)"
+            })
+            return
+
         if path == "/api/stats":
             stats = self.server.storage.get_stats()
             self._send_json(200, {"success": True, "stats": stats})

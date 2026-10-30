@@ -52,10 +52,10 @@
         },
         "offers": {
           "@type": "Offer",
-          "price": "19.00",
+          "price": "0",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
-          "url": "https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L"
+          "url": "https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X"
         },
         "featureList": [
           "Zero External Pip Dependencies",
@@ -474,23 +474,13 @@
       overflow: hidden;
     }
     .pro-blur-target {
-      filter: blur(6px);
-      pointer-events: none;
-      user-select: none;
-      opacity: 0.6;
+      filter: none !important;
+      pointer-events: auto !important;
+      user-select: auto !important;
+      opacity: 1 !important;
     }
     .paywall-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(8, 8, 11, 0.82);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      text-align: center;
-      z-index: 10;
-      backdrop-filter: blur(3px);
+      display: none !important;
     }
 
     /* Toast Notification */
@@ -528,7 +518,7 @@
       justify-content: center;
       z-index: 200;
       padding: 16px;
-      backdrop-filter: blur(8px);
+      backdrop-filter: none;
     }
     .modal-backdrop.active {
       display: flex;
@@ -571,10 +561,52 @@
     }
   </style>
 
+  <!-- Wave Enhancement Stylesheet -->
+  <link rel="stylesheet" href="/wave.css">
+  <link rel="stylesheet" href="/wave-states.css">
+
   <!-- DePay Solana Payment Widget SDK -->
-  <script src="https://integrate.depay.com/widgets/v13.js" defer></script>
+  
+  <!-- Zoth 100% Open-Access & Buy Us a Coffee Invariant -->
+  <script id="zoth-open-access-init">
+    (function() {
+      try {
+        var keys = ['agent_audiocipher_pro', 'agent_cyber_turtle_pro', 'agent_datamosh_pro', 'agent_nexus3d_pro', 'agent_policy_pro', 'audiocipher_license', 'audiocipher_pro_licensed', 'badge3d_pro_licensed', 'certpath_pro_key', 'certpath_pro_licensed', 'cron_rhythm_pro_key', 'cron_rhythm_pro_licensed', 'cwv-speed-engine_pro_licensed', 'cwv_pro_licensed', 'cyber_turtle_pro_licensed', 'datamosh_pro_licensed', 'deepsearch-research-agent_pro_licensed', 'deepsearch_pro_licensed', 'entropy_studio_licensed', 'envguard-secrets-vault_pro_licensed', 'envguard_pro_license', 'etsy_connector_pro', 'jwt_guard_licensed', 'mdg_pro_licensed', 'neuro_pro_licensed', 'nexus3d_pro_licensed', 'omnipost_pro_key', 'omnipost_pro_licensed', 'osint_pro_licensed', 'payload-entropy-studio_pro_licensed', 'polyglot_pro_licensed', 'pro_licensed', 'promptmaster_pro_licensed', 'promptmaster_pro_active', 'robots-txt-auditor_pro_licensed', 'robots_pro_licensed', 'schema_illustrator_pro_licensed', 'sovereign_pro_licensed', 'subsweep-lead-scanner_pro_licensed', 'subsweep_licensed', 'turtle_pro_licensed', 'ufo_sacred_licensed', 'vector-search-engine_pro_licensed', 'vector_studio_pro_licensed', 'web-security-guard_pro_licensed', 'web_security_guard_licensed', 'yourdigitalspace_pro', 'zela_guide_pro_licensed', 'zoth_ascii_magic_pro', 'zoth_audiocipher_licensed', 'zoth_badge3d_licensed', 'zoth_cyber_turtle_licensed', 'zoth_datamosh_licensed', 'zoth_etsy_licensed', 'zoth_nexus3d_licensed', 'zoth_osint_licensed', 'zoth_policy_licensed', 'zoth_sacred_licensed', 'zoth_ufo_licensed'];
+        for (var i = 0; i < keys.length; i++) {
+          localStorage.setItem(keys[i], 'true');
+        }
+        localStorage.setItem('pm_license_v2', JSON.stringify({ method: 'open_access', ref: 'free_forever', at: '2026-01-01T00:00:00Z' }));
+        window.isPro = true;
+        window.isProLicensed = true;
+      } catch (e) {}
+    })();
+  </script>
+  <style id="zoth-open-access-override">
+    .paywall-overlay, .output-paywall-overlay, #outputPaywallOverlay, #schemaPaywallOverlay,
+    #transformerPaywallOverlay, #proPaywallModal, #licenseModal, #salesBanner, #founding-offer-banner,
+    #funnelHeroBanner, [data-alias="paywallOverlay"], [data-alias="founding-offer-banner"] {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    .paywall-wrap #outputPreview, .paywall-wrap #reportContentArea, .paywall-content,
+    .paywall-content.locked, .paywall-wrap.is-locked #outputPreview, .paywall-wrap.locked #outputPreview {
+      filter: none !important;
+      -webkit-filter: none !important;
+      user-select: auto !important;
+      pointer-events: auto !important;
+    }
+  </style>
+
 </head>
 <body>
+
+<div id="zoth-coffee-support-bar" style="background: linear-gradient(90deg, rgba(16,185,129,0.12), rgba(212,175,55,0.14)); border-bottom: 1px solid rgba(212,175,55,0.35); padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; z-index: 9999;">
+  <span style="color: #10B981; font-weight: 800;">✦ 100% FREE &amp; OPEN ACCESS · ZERO PAYWALLS</span>
+  <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" style="background: #D4AF37; color: #08080B; padding: 4px 12px; border-radius: 6px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">☕ Buy Us a Coffee (Stripe)</a>
+  <a href="solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK" onclick="if(navigator.clipboard){navigator.clipboard.writeText('GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK');this.textContent='✓ Copied GG2eQb...dXoK!';}" style="background: rgba(20,241,149,0.15); color: #14F195; border: 1px solid rgba(20,241,149,0.45); padding: 4px 12px; border-radius: 6px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">◎ Solana Tip (GG2e...dXoK)</a>
+</div>
+
 
   <!-- Top Global Navigation Bar -->
   <header>
@@ -582,44 +614,36 @@
       <img src="assets/icon.png" alt="Agent Mock Twin Brand Icon" style="width: 28px; height: 28px; border-radius: 6px;">
       <span>AGENT MOCK TWIN</span>
       <span class="badge" style="background: rgba(212,175,55,0.15); color: var(--gold-glow); border: 1px solid rgba(212,175,55,0.3); font-size: 11px;">v2.5 SOVEREIGN</span>
-      <span class="badge badge-free" id="licenseBadge">⚡ FREE TIER</span>
+      <span class="badge" id="licenseBadge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11px; font-weight: 800;">✦ 100% FREE &amp; OPEN ACCESS</span>
     </div>
     
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <button type="button" class="btn btn-outline" style="min-height: 38px; padding: 6px 14px; font-size: 12px;" onclick="openProModal()">
-        <span>✦</span> Activate License
-      </button>
       <a href="https://github.com/1nc0gn30/agent-mock-twin" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="min-height: 38px; padding: 6px 14px; font-size: 12px;">
         <span>★</span> GitHub
       </a>
-      <a href="https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="min-height: 38px; padding: 6px 14px; font-size: 12px;">
-        <span>⚡</span> Get Pro ($19)
+      <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="min-height: 38px; padding: 6px 14px; font-size: 12px; background: #D4AF37; color: #08080B; font-weight: 800;">
+        ☕ Buy Us a Coffee (Stripe)
       </a>
+      <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()" style="min-height: 38px; padding: 6px 14px; font-size: 12px; background: #10B981; color: #FFF; font-weight: 700; border: none; cursor: pointer;">
+        Solana Tip ⚡
+      </button>
     </div>
   </header>
 
   <div class="container">
 
-    <!-- High-Converting Sales Funnel Banner -->
-    <section class="sales-banner" id="salesBanner" aria-label="Founding Member Pricing">
+    <!-- Sovereign Open Access Support Bar -->
+    <section class="sales-banner" id="salesBanner" aria-label="Sovereign Open Access Bar" style="background: linear-gradient(90deg, rgba(16,185,129,0.12), rgba(212,175,55,0.14)); border: 1px solid rgba(212,175,55,0.35);">
       <div class="sales-banner-text">
-        <h2><span>◉</span> Autonomous Network Twin — Founding Lifetime Access</h2>
-        <p>Run agent test suites in CI/CD without burning API credits. Zero external dependencies.</p>
-        <div class="pricing-pill">
-          <span class="price-strike">$79 Regular</span>
-          <span>→</span>
-          <span class="price-urgent">$19 Lifetime Access (Founding Member)</span>
-        </div>
+        <h2 style="color: #10B981;"><span>◉</span> Autonomous Network Twin — 100% Free &amp; Open Access</h2>
+        <p>Run agent test suites in CI/CD without burning API credits. Zero external dependencies. Voluntary tips support development.</p>
       </div>
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <a href="https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L" target="_blank" rel="noopener noreferrer" class="btn btn-stripe">
-          <span>★</span> Credit Card / Apple Pay ($19)
+        <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" class="btn btn-stripe" style="background: #D4AF37; color: #08080B; font-weight: 800;">
+          ☕ Buy Us a Coffee (Stripe)
         </a>
-        <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()">
-          <span>◎</span> Pay with Solana ($19)
-        </button>
-        <button type="button" class="btn btn-outline" id="btnActivateBanner" onclick="openProModal()" style="min-height: 44px;">
-          <span>✦</span> Activate Key
+        <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()" style="background: #10B981; color: #FFF; font-weight: 700;">
+          Solana Tip ⚡
         </button>
       </div>
     </section>
@@ -825,59 +849,32 @@
       </div>
     </div>
 
-    <!-- Frosted Glass Output Paywall: Advanced Chaos & Jitter Engine -->
-    <section class="paywall-wrapper glass-card" style="margin-bottom: 40px; padding: 0;">
-      
-      <!-- Locked Pro Workspace (Blurred) -->
-      <div class="pro-blur-target" style="padding: 24px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--gold-glow);">
-            ⚡ Pro Engine: Dynamic Chaos Fault Injection & Jitter Topology
-          </h3>
-          <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid #F59E0B;">PRO REQUIRED</span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px;">
-          <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">CHAOS FAULT RATE</div>
-            <div style="font-size: 20px; font-weight: 800; color: #EF4444; margin-top: 4px;">5.0% Rate Limits</div>
-            <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Simulates upstream HTTP 429 & 503 backpressure</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">FUZZY PAYLOAD TOLERANCE</div>
-            <div style="font-size: 20px; font-weight: 800; color: var(--cyan-glow); margin-top: 4px;">Jaccard 0.85</div>
-            <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Semantic JSON key & prompt drift reconciliation</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">HEADLESS CI DOCKER EXPORT</div>
-            <div style="font-size: 20px; font-weight: 800; color: var(--emerald-glow); margin-top: 4px;">Ready</div>
-            <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Zero-dependency Alpine container for GitHub Actions</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Glowing Centered Lock Overlay -->
-      <div class="paywall-overlay" id="paywallOverlay">
-        <div style="font-size: 36px; margin-bottom: 10px;">★</div>
-        <h3 style="font-family: var(--font-display); font-size: 22px; color: #FFF; font-weight: 800; margin-bottom: 6px;">
-          Unlock Advanced Chaos Engine & Fuzzy Replay
+    <!-- Sovereign Engine: Dynamic Chaos & Jitter Engine -->
+    <section class="glass-card" style="margin-bottom: 40px; padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--gold-glow);">
+          ⚡ Sovereign Engine: Dynamic Chaos Fault Injection & Jitter Topology
         </h3>
-        <p style="font-size: 13px; color: #D1D5DB; max-width: 480px; margin-bottom: 18px;">
-          Stress-test autonomous agent resilience against simulated upstream outages, rate limit retries, and prompt drift with zero external dependencies.
-        </p>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-          <a href="https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L" target="_blank" rel="noopener noreferrer" class="btn btn-stripe">
-            <span>★</span> Unlock via Stripe ($19 Lifetime)
-          </a>
-          <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()">
-            <span>◎</span> Unlock via Solana ($19)
-          </button>
-          <button type="button" class="btn btn-outline" id="btnKeyOverlay" onclick="openProModal()">
-            <span>✦</span> Enter Key / Email
-          </button>
-        </div>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-glow); border: 1px solid rgba(16, 185, 129, 0.4);">✦ UNLOCKED & ACTIVE</span>
       </div>
 
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+        <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">CHAOS FAULT RATE</div>
+          <div style="font-size: 20px; font-weight: 800; color: #EF4444; margin-top: 4px;">5.0% Rate Limits</div>
+          <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Simulates upstream HTTP 429 & 503 backpressure</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">FUZZY PAYLOAD TOLERANCE</div>
+          <div style="font-size: 20px; font-weight: 800; color: var(--cyan-glow); margin-top: 4px;">Jaccard 0.85</div>
+          <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Semantic JSON key & prompt drift reconciliation</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px;">
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">HEADLESS CI DOCKER EXPORT</div>
+          <div style="font-size: 20px; font-weight: 800; color: var(--emerald-glow); margin-top: 4px;">Ready</div>
+          <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Zero-dependency Alpine container for GitHub Actions</div>
+        </div>
+      </div>
     </section>
 
     <!-- FAQ Section for AEO & Google SGE Discovery -->
@@ -920,89 +917,22 @@
     </div>
   </footer>
 
-  <!-- Pro Paywall Modal -->
-  <div class="modal-backdrop" id="proModal" data-alias="licenseModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-box">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-        <h3 id="modalTitle" style="font-family: var(--font-display); font-size: 20px; color: var(--gold-glow);">
-          ⭐ Unlock Agent Mock Twin Pro
-        </h3>
-        <button type="button" id="closeProModal" onclick="closeProModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
-      </div>
-
-      <p style="font-size: 13px; color: #D1D5DB; margin-bottom: 16px;">
-        One-time investment of $19 for permanent lifetime access. Deploy autonomous agent testing without monthly subscriptions.
-      </p>
-
-      <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 12px;">
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Fuzzy Semantic Payload Matching & Prompt Drift Tolerance
-        </li>
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Dynamic Chaos Fault Injection (HTTP 429 Rate Limits, 500/503 Errors)
-        </li>
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Configurable Latency Simulation & Microsecond Jitter Control
-        </li>
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Unlimited HAR 1.2 Archive & OpenAPI 3.0 Blueprint Storage
-        </li>
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Headless CI/CD Docker Container & GitHub Actions Workflow
-        </li>
-        <li style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #10B981;">✓</span> Lifetime Updates with Zero External Pip Dependencies
-        </li>
-      </ul>
-
-      <!-- Dual Payment Rails -->
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;">
-        <a href="https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L" target="_blank" rel="noopener noreferrer" class="btn btn-stripe" style="flex: 1;">
-          <span>★</span> Stripe Checkout ($19)
-        </a>
-        <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()" style="flex: 1;">
-          <span>◎</span> DePay Solana ($19)
-        </button>
-      </div>
-
-      <!-- Instant Key Input -->
-      <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px;">
-        <label for="licenseKeyInput" style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Already purchased? Enter receipt email or license key:</label>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="licenseKeyInput" placeholder="name@domain.com or AMT-PRO-XXXX" style="flex: 1; background: #050608; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px 12px; color: #FFF; font-family: var(--font-mono); font-size: 12px;">
-          <button type="button" id="btnActivateKey" data-alias="btnActivateKey" class="btn btn-gold" onclick="activateWithKey()" style="min-height: 38px; padding: 6px 16px;">Activate</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DePay Solana Payment Handler -->
+  <!-- Solana Tip Handler -->
   <script>
-    function startDePaySolanaPayment() {
-      if (window.DePay && window.DePay.Payment) {
-        try {
-          window.DePay.Payment({
-            accept: [
-              {
-                blockchain: 'solana',
-                token: '11111111111111111111111111111111',
-                receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK',
-                amount: 19
-              },
-              {
-                blockchain: 'solana',
-                token: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
-                receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK',
-                amount: 19
-              }
-            ]
-          });
-          return;
-        } catch (err) {
-          console.warn('DePay widget fallback:', err);
-        }
+    function copySolanaTip() {
+      const address = 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(address).then(() => {
+          showNotification('✓ Solana address copied: ' + address.slice(0, 6) + '...' + address.slice(-4));
+        }).catch(() => {
+          prompt('Copy Solana Tip Address:', address);
+        });
+      } else {
+        prompt('Copy Solana Tip Address:', address);
       }
-      window.open('https://depay.com/pay?integration=428790dd-7ad1-407c-8ecf-c048c77a4cb8&receiver=GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK&amount=19', '_blank');
+    }
+    function startDePaySolanaPayment() {
+      copySolanaTip();
     }
   </script>
 
