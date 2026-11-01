@@ -804,17 +804,24 @@
     }
 
     elReplayList.innerHTML = state.recentHits.slice(0, 15).map(h => {
-      const matchBadge = h.match_type === 'exact'
-        ? '<span class="status-pill status-exact">EXACT</span>'
-        : (h.match_type === 'fuzzy'
-          ? '<span class="status-pill status-fuzzy">FUZZY</span>'
-          : '<span class="status-pill status-fallback">FALLBACK</span>');
+      const code = h.status_code || 200;
+      const isError = code >= 400;
+      const matchBadge = h.match_type === 'chaos_fault' || isError
+        ? '<span class="status-pill status-fallback" style="background:rgba(244,63,94,0.18);color:#F43F5E;border-color:rgba(244,63,94,0.45);">CHAOS_FAULT</span>'
+        : (h.match_type === 'exact'
+          ? '<span class="status-pill status-exact">EXACT</span>'
+          : (h.match_type === 'fuzzy'
+            ? '<span class="status-pill status-fuzzy">FUZZY</span>'
+            : '<span class="status-pill status-fallback">FALLBACK</span>'));
+      const codeStyle = isError
+        ? 'background:rgba(244,63,94,0.18);color:#F43F5E;border-color:rgba(244,63,94,0.45);'
+        : '';
 
       return `
-        <div class="replay-card">
+        <div class="replay-card" style="${isError ? 'border-color: rgba(244, 63, 94, 0.35);' : ''}">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="status-code">200</span>
+              <span class="status-code" style="${codeStyle}">${code}</span>
               <span style="font-weight: 700; font-size: 11px; color: #FFF;">${escapeHtml(h.method)}</span>
               <span style="font-family: monospace; font-size: 11px; color: var(--cyan-glow);">${escapeHtml(h.path)}</span>
             </div>
@@ -822,7 +829,7 @@
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px;">
             <span>⚡ ${h.latency_ms || 25}ms · ${escapeHtml((h.provider || 'api').toUpperCase())}</span>
-            <span style="color: var(--gold-glow); font-weight: 600;">Saved ~${h.tokens_saved || 35} tokens ($0.00 cost)</span>
+            <span style="color: ${isError ? '#F43F5E' : 'var(--gold-glow)'}; font-weight: 600;">${isError ? 'Injected 503 Chaos Fault' : `Saved ~${h.tokens_saved || 35} tokens ($0.00 cost)`}</span>
           </div>
         </div>
       `;

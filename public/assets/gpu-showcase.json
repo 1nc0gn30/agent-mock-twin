@@ -1,0 +1,41 @@
+{
+  "repo_id": "agent-mock-twin",
+  "title": "Agent Mock Twin",
+  "engineered_by": "1nc0gn30 (@1nc0gn30) \u2022 NullAI Platform",
+  "gpu_engine": "NVIDIA A100 80GB PCIe (ComfyUI FLUX.1 + Qwen2.5-Coder-32B + Trimesh GLB)",
+  "archetype": "quorum",
+  "accent_hex": "#D4AF37",
+  "qwen32b_design_spec": "Agent Mock Twin: Quorum archetype, #D4AF37 accent, sleek UI, dynamic shaders, realistic lighting, interactive elements, responsive design.",
+  "assets": {
+    "hero_4k": "/assets/gpu-hero-4k.png",
+    "og_banner": "/og-banner.jpg",
+    "model_3d_glb": "/assets/gpu-artifact.glb",
+    "showreel_webm": "/assets/gpu-showreel.webm",
+    "ad_mp4": "/assets/gpu-ad-15s.mp4"
+  },
+  "benchmark_ms": {
+    "index": 14,
+    "total_repos": 99,
+    "repo_id": "agent-mock-twin",
+    "title": "Agent Mock Twin",
+    "archetype": "quorum",
+    "accent_hex": "#D4AF37",
+    "glb_ms": 1561,
+    "flux_hero_ms": 8497,
+    "flux_og_ms": 6592,
+    "video_ms": 1835,
+    "qwen32b_ms": 3948,
+    "total_ms": 22435,
+    "glb_kb": 126.8,
+    "hero_kb": 1115.0,
+    "og_kb": 803.8,
+    "qwen32b_spec": "Agent Mock Twin: Quorum archetype, #D4AF37 accent, sleek UI, dynamic shaders, realistic lighting, interactive elements, responsive design.",
+    "hero_gallery_url": "/gallery/agent-mock-twin_gpu-hero-4k.png",
+    "og_gallery_url": "/gallery/agent-mock-twin_og-banner.jpg",
+    "glb_gallery_url": "/gallery/agent-mock-twin.glb",
+    "vram_used_mb": 55829,
+    "vram_total_mb": 81152,
+    "timestamp": "03:24:03 UTC"
+  },
+  "timestamp": "2026-11-01T03:24:03Z"
+}

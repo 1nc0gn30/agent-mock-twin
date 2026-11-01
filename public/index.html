@@ -46,8 +46,8 @@
         "description": "Autonomous offline API mock server and network twin for AI agents. Ingests HAR 1.2 archives and OpenAPI 3.0 specs to provide deterministic $0 token cost agent execution.",
         "creator": {
           "@type": "Person",
-          "name": "Neal Frazier",
-          "url": "https://nealfrazier.tech",
+          "name": "1nc0gn30",
+          "url": "https://nullai.tech",
           "sameAs": "https://github.com/1nc0gn30"
         },
         "offers": {
@@ -565,7 +565,7 @@
   <link rel="stylesheet" href="/wave.css">
   <link rel="stylesheet" href="/wave-states.css">
 
-  <!-- DePay Solana Payment Widget SDK -->
+  <!-- Solana Tip Solana Payment Widget SDK -->
   
   <!-- Zoth 100% Open-Access & Buy Us a Coffee Invariant -->
   <script id="zoth-open-access-init">
@@ -624,7 +624,7 @@
       <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="min-height: 38px; padding: 6px 14px; font-size: 12px; background: #D4AF37; color: #08080B; font-weight: 800;">
         ☕ Buy Us a Coffee (Stripe)
       </a>
-      <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()" style="min-height: 38px; padding: 6px 14px; font-size: 12px; background: #10B981; color: #FFF; font-weight: 700; border: none; cursor: pointer;">
+      <button type="button" class="btn btn-solana" onclick="startSolanaTipSolanaPayment()" style="min-height: 38px; padding: 6px 14px; font-size: 12px; background: #10B981; color: #FFF; font-weight: 700; border: none; cursor: pointer;">
         Solana Tip ⚡
       </button>
     </div>
@@ -642,7 +642,7 @@
         <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" class="btn btn-stripe" style="background: #D4AF37; color: #08080B; font-weight: 800;">
           ☕ Buy Us a Coffee (Stripe)
         </a>
-        <button type="button" class="btn btn-solana" onclick="startDePaySolanaPayment()" style="background: #10B981; color: #FFF; font-weight: 700;">
+        <button type="button" class="btn btn-solana" onclick="startSolanaTipSolanaPayment()" style="background: #10B981; color: #FFF; font-weight: 700;">
           Solana Tip ⚡
         </button>
       </div>
@@ -840,10 +840,10 @@
         <span>⚡</span> Enterprise CI/CD & Chaos Suite
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button type="button" class="btn btn-outline" id="btnExportDockerLive" onclick="openProModal()" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
+        <button type="button" class="btn btn-outline" id="btnExportDockerLive" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
           <span>▣</span> Export CI Docker Container
         </button>
-        <button type="button" class="btn btn-outline" id="btnChaosTriggerLive" onclick="openProModal()" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
+        <button type="button" class="btn btn-outline" id="btnChaosTriggerLive" style="min-height: 40px; padding: 6px 14px; font-size: 12px;">
           <span>⚡</span> Simulate 503 Outage
         </button>
       </div>
@@ -909,7 +909,7 @@
   <!-- Professional Sovereign Attribution Footer -->
   <footer style="text-align: center; padding: 24px 20px; border-top: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 12px; background: rgba(8, 8, 11, 0.95);">
     <div style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-      <span>Engineered by <strong>Neal Frazier Tech</strong> (<a href="https://github.com/1nc0gn30" target="_blank" rel="noopener noreferrer" style="color: var(--gold-glow); text-decoration: none;">@1nc0gn30</a>)</span>
+      <span>Engineered by <strong>1nc0gn30 • NullAI</strong> (<a href="https://github.com/1nc0gn30" target="_blank" rel="noopener noreferrer" style="color: var(--gold-glow); text-decoration: none;">@1nc0gn30</a>)</span>
       <span>•</span>
       <span><a href="https://nullai.tech" target="_blank" rel="noopener noreferrer" style="color: var(--cyan-glow); text-decoration: none;">NullAI Platform</a></span>
       <span>•</span>
@@ -931,12 +931,13 @@
         prompt('Copy Solana Tip Address:', address);
       }
     }
-    function startDePaySolanaPayment() {
+    function startSolanaTipSolanaPayment() {
       copySolanaTip();
     }
   </script>
 
   <!-- Client-side Logic Script -->
   <script src="/mock_engine.js"></script>
+  <script src="/assets/sovereign-upgrade.js" defer></script>
 </body>
 </html>

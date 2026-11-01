@@ -182,7 +182,8 @@ class MockStorage:
         return count
 
     def get_routes(self) -> List[RecordedRoute]:
-        """Return list of all cached routes."""
+        """Return list of all cached routes (syncing with SQLite)."""
+        self._load_cache()
         with self._lock:
             return list(self._routes_cache)
 
@@ -254,6 +255,7 @@ class MockStorage:
 
     def get_stats(self) -> Dict[str, Any]:
         """Aggregate global server stats."""
+        self._load_cache()
         with self._lock:
             conn = self._get_connection()
             try:

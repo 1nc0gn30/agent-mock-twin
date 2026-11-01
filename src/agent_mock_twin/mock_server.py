@@ -341,6 +341,8 @@ class MockHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         """Import HAR or OpenAPI blueprint JSON."""
         try:
             data = json.loads(body_text)
+            if isinstance(data, dict) and "content" in data and isinstance(data["content"], str):
+                data = json.loads(data["content"])
             routes: List[RecordedRoute] = []
 
             # Check if HAR or OpenAPI
