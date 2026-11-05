@@ -939,5 +939,21 @@
   <!-- Client-side Logic Script -->
   <script src="/mock_engine.js"></script>
   <script src="/assets/sovereign-upgrade.js" defer></script>
+
+  <script src="/sovereign_tutorial.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      if (window.createSovereignTutorial) {
+        window.createSovereignTutorial({
+          toolId: "agent-mock-twin",
+          toolName: "Agent Mock Twin",
+          tagline: "Clone external APIs into lightning-fast, zero-cost simulated twins!",
+          accentColor: "#10B981",
+          steps: [{"icon": "\ud83d\udc6f", "title": "What is a Mock Twin?", "desc": "Instead of paying for expensive cloud APIs every time you test your agents, Mock Twin creates a free simulator that behaves identically."}, {"icon": "\u26a1", "title": "Zero Latency Offline Testing", "desc": "Develop and debug your agent tools completely offline on airplanes, trains, or without internet."}, {"icon": "\ud83d\udcb0", "title": "Save 100% on API Bills", "desc": "Run thousands of automated unit tests without spending a single penny on token fees."}]
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
