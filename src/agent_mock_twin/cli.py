@@ -130,18 +130,46 @@ def cmd_import(args: argparse.Namespace) -> int:
 
 def cmd_stats(args: argparse.Namespace) -> int:
     """Display summary of token and USD savings."""
+    import json
+    import urllib.request
+
+    port = getattr(args, "port", 8097)
+    as_json = bool(getattr(args, "json", False))
+    live_health = None
+    live_stats = None
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=2.0) as resp:
+            live_health = json.loads(resp.read().decode("utf-8"))
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/stats", timeout=2.0) as resp:
+            live_stats = json.loads(resp.read().decode("utf-8")).get("stats")
+    except Exception:
+        pass
+
     storage = MockStorage(db_path=args.db)
-    stats = storage.get_stats()
+    stats = live_stats if live_stats is not None else storage.get_stats()
+
+    if as_json:
+        print(json.dumps({
+            "service": "agent-mock-twin",
+            "version": "2.5.0",
+            "online": live_health is not None,
+            "port": port,
+            "health": live_health,
+            "stats": stats,
+        }, indent=2))
+        return 0
+
     print("=" * 60)
     print("  AGENT MOCK TWIN TELEMETRY SUMMARY")
     print("=" * 60)
-    print(f"  Total Requests Intercepted: {stats['total_hits']:,}")
-    print(f"  Total API Tokens Saved:     {stats['total_tokens_saved']:,}")
-    print(f"  Estimated Cost Saved:       ${stats['total_usd_saved']:.4f} USD")
-    print(f"  Active Mock Routes:         {stats['routes_count']:,}")
-    print(f"  Providers Indexed:          {', '.join(stats['providers']) or 'None'}")
-    print(f"  Average Simulated Latency:  {stats['avg_latency_ms']} ms")
-    if stats["matches_by_type"]:
+    print(f"  Daemon Endpoint:            http://127.0.0.1:{port} ({'ONLINE' if live_health else 'LOCAL DB'})")
+    print(f"  Total Requests Intercepted: {stats.get('total_hits', 0):,}")
+    print(f"  Total API Tokens Saved:     {stats.get('total_tokens_saved', 0):,}")
+    print(f"  Estimated Cost Saved:       ${stats.get('total_usd_saved', 0.0):.4f} USD")
+    print(f"  Active Mock Routes:         {stats.get('routes_count', 0):,}")
+    print(f"  Providers Indexed:          {', '.join(stats.get('providers', [])) or 'None'}")
+    print(f"  Average Simulated Latency:  {stats.get('avg_latency_ms', 0)} ms")
+    if stats.get("matches_by_type"):
         print("  Match Tier Breakdown:")
         for tier, count in stats["matches_by_type"].items():
             print(f"    - {tier.capitalize()}: {count:,}")
@@ -240,6 +268,11 @@ def main() -> None:
         prog="agent-mock",
         description="Autonomous Offline API Mock & Network Twin for AI Agents",
     )
+    parser.add_argument("-v", "--version", action="version", version="agent-mock-twin 2.5.0")
+    parser.add_argument("--status", action="store_true", help="Display mock server status and token savings")
+    parser.add_argument("--json", action="store_true", help="Output telemetry as JSON")
+    parser.add_argument("--port", type=int, default=8097, help="Mock server port (default: 8097)")
+    parser.add_argument("--db", default="agent_mock.db", help="Path to SQLite database")
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # serve command
@@ -260,6 +293,14 @@ def main() -> None:
     # stats command
     p_stats = subparsers.add_parser("stats", help="Display token savings and telemetry stats")
     p_stats.add_argument("--db", default="agent_mock.db", help="Path to SQLite database")
+    p_stats.add_argument("--port", type=int, default=8097, help="Mock server port (default: 8097)")
+    p_stats.add_argument("--json", action="store_true", help="Output telemetry as JSON")
+
+    # status command
+    p_status = subparsers.add_parser("status", help="Display mock server status and telemetry stats")
+    p_status.add_argument("--db", default="agent_mock.db", help="Path to SQLite database")
+    p_status.add_argument("--port", type=int, default=8097, help="Mock server port (default: 8097)")
+    p_status.add_argument("--json", action="store_true", help="Output telemetry as JSON")
 
     # run command
     p_run = subparsers.add_parser("run", help="Run agent command with environment redirected to local mock twin")
@@ -272,15 +313,18 @@ def main() -> None:
     # Parse known args so `run` can consume trailing command
     args, remaining = parser.parse_known_args()
 
+    if getattr(args, "status", False) or (getattr(args, "json", False) and not args.command):
+        sys.exit(cmd_stats(args))
+
     if not args.command:
         parser.print_help()
-        sys.exit(1)
+        sys.exit(0)
 
     if args.command == "serve":
         sys.exit(cmd_serve(args))
     elif args.command == "import":
         sys.exit(cmd_import(args))
-    elif args.command == "stats":
+    elif args.command in ("stats", "status"):
         sys.exit(cmd_stats(args))
     elif args.command == "run":
         sys.exit(cmd_run(args, remaining))

@@ -1,197 +1,107 @@
-<div align="center">
-  <img src="assets/hero-banner.svg" alt="Agent Mock Twin — Sovereign Architecture Banner" width="100%" />
-</div>
+# Agent Mock Twin
 
-<br />
+![Agent Mock Twin Hero Banner](assets/hero-banner.svg)
 
-# AGENT MOCK TWIN ⚡
+**Agent Mock Twin** (`agent-mock-twin`) is a zero-dependency Python 3.10+ offline API mock server, LLM endpoint simulator (`/v1/chat/completions`, `/v1/messages`, `/v1/embeddings`), and telemetry workstation (`127.0.0.1:8097`). It ingests HAR 1.2 network captures and OpenAPI 3.0 specifications into SQLite (`agent_mock.db`) to replay deterministic responses with configurable latency, jitter, and chaos fault injection at `$0.00` token cost.
 
-> **Autonomous Offline API Mock & Network Twin for AI Agents**  
-> *Run autonomous agents in CI/CD and local development loops with **$0 API token cost**, zero latency, and 100% deterministic outputs.*
-
-[![Zero Pip Dependencies](https://img.shields.io/badge/Dependencies-Zero%20External%20Pip-10B981?style=flat-square)](https://github.com/1nc0gn30/agent-mock-twin)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B%20StdLib-38BDF8?style=flat-square)](https://python.org)
-[![HAR 1.2 & OpenAPI 3.0](https://img.shields.io/badge/Ingestion-HAR%201.2%20%26%20OpenAPI%203.0-D4AF37?style=flat-square)](https://github.com/1nc0gn30/agent-mock-twin)
-[![License: MIT](https://img.shields.io/badge/License-MIT-A855F7?style=flat-square)](LICENSE)
-[![100% Free & Open Access](https://img.shields.io/badge/Access-100%25%20Free%20%26%20Open-10B981?style=flat-square)](https://github.com/1nc0gn30/agent-mock-twin)
+- **Zoth Studio v2 Dossier**: [https://zoth.nullai.tech/tools/agent-mock-twin](https://zoth.nullai.tech/tools/agent-mock-twin)
+- **Repository**: [https://github.com/1nc0gn30/agent-mock-twin](https://github.com/1nc0gn30/agent-mock-twin)
+- **Default Loopback Endpoint**: `http://127.0.0.1:8097`
 
 ---
 
-## 💎 What It Does
+## Overview
 
-Autonomous AI agents iterate over complex loops: planning, tool execution, memory retrieval, and self-auditing. In modern development:
-1. **Rampant Token Costs**: Every automated CI test run hits live LLM provider APIs (OpenAI, Anthropic, Gemini), burning hundreds of dollars in token billing.
-2. **Brittle Flakiness**: Rate limits (HTTP 429), upstream outages, and stochastic model responses cause integration test suites to randomly fail.
-3. **Slow Latency**: Waiting 1,500ms–6,000ms per agent turn stalls CI pipelines and local developer velocity.
-
-**AGENT MOCK TWIN** solves this by establishing an autonomous, zero-dependency offline network twin. It ingests real network recordings (standard HAR 1.2 files from `agent-egress-sentinel` or OpenAPI 3.0 specs) and hosts a microsecond-latency local mock server that deterministically answers agent queries at **$0.00 cost**.
+- **HAR 1.2 & OpenAPI 3.0 Ingestion (`HarParser`, `OpenAPIParser`)**: Converts captured network traces (such as exports from `agent-egress-sentinel`) or OpenAPI schemas into indexed SQLite mock routes.
+- **Multi-Tier Request Matcher (`RequestMatcher`)**: Resolves incoming requests via exact signature hash, normalized path/body similarity, OpenAPI path-template matching, or built-in OpenAI/Anthropic LLM response synthesis.
+- **Latency & Chaos Simulation**: Injects configurable base latency (`--latency`), random jitter (`--jitter`), and HTTP `429`/`500`/`503` chaos rates (`--chaos 0.0..1.0`) to stress-test agent retry and circuit-breaker logic offline.
+- **Zero-Code Process Wrapper (`agent-mock run`)**: Launches child agent commands with `OPENAI_BASE_URL`, `OPENAI_API_BASE`, and `ANTHROPIC_BASE_URL` automatically pointed to `http://127.0.0.1:8097`.
 
 ---
 
-## 🏛️ How It Works: The Multi-Tier Matching Engine
+## Architecture
 
 ```text
-    ┌─────────────────────────────────────────────────────────┐
-    │              ● AGENT MOCK TWIN (PORT 8097)              │
-    │                                                         │
-    │   ┌───────────────────────┐   ┌─────────────────────┐   │
-    │   │  MULTI-TIER MATCHER   │   │   SQLITE STORAGE    │   │
-    │   │  1. Exact Hash Match  │   │  • Routes Cache     │   │
-    │   │  2. Fuzzy Semantic    │   │  • Hit Telemetry    │   │
-    │   │  3. Fallback Synth    │   │  • Microsec Lookups │   │
-    │   └───────────────────────┘   └─────────────────────┘   │
-    │               ▲                          ▲              │
-    │               │                          │              │
-    └───────────────┼──────────────────────────┼──────────────┘
-                    │                          │
-           Intercepted Traffic        Ingested HAR / Specs
-                    │                          │
-        ┌───────────────────────┐   ┌─────────────────────┐
-        │   AUTONOMOUS AGENT    │   │ HAR 1.2 / OpenAPI   │
-        │   pytest / CI Runner  │   │ Egress Recordings   │
-        └───────────────────────┘   └─────────────────────┘
+HAR 1.2 / OpenAPI 3.0 Spec ──► HarParser / OpenAPIParser ──► MockStorage (SQLite)
+                                                                   │
+Agent SDK / CLI (OPENAI_BASE_URL -> :8097/v1) ──► MockServer (:8097) + RequestMatcher
+                                                       └── SSE Stream (/api/stream) + Web UI
 ```
-
-### Multi-Tier Request Matcher
-1. **Tier 1 — Exact Match**: Matches HTTP Method + Normalized Path + Request Body SHA256 Hash. Answers with the exact recorded status and response payload with 100% fidelity.
-2. **Tier 2 — Fuzzy Semantic Match**: Reconciles subtle prompt drift and variable JSON parameter keys using Jaccard key similarity and model matching.
-3. **Tier 3 — Fallback Synthesis**: If an agent hits an unseen endpoint (e.g. `/v1/chat/completions` or `/v1/messages`), the server synthesizes a valid, structured provider response with zero outbound internet access.
 
 ---
 
-## 🚀 Quickstart & Zero-Pip Installation
-
-`agent-mock-twin` requires **zero pip packages**. It runs directly on Python 3.10+ standard library.
+## Quickstart
 
 ```bash
-# Clone the repository
 git clone https://github.com/1nc0gn30/agent-mock-twin.git
 cd agent-mock-twin
+python3 -m pip install -e .
 
-# Start server directly
-python3 server.py --port 8097
+# Start the Offline Mock Twin & Web Dashboard on 127.0.0.1:8097
+agent-mock serve --host 127.0.0.1 --port 8097 --latency 25 --jitter 15
 ```
 
-- **Web Dashboard**: `http://localhost:8097/`
-- **OpenAI Mock Base**: `http://localhost:8097/v1`
-- **Anthropic Mock Base**: `http://localhost:8097`
-
----
-
-## 🛠️ ZothOS CLI & Subcommands
-
-The tool is pre-installed across ZothOS as `agent-mock-twin` and `agent-mock`:
+Or launch directly from the repository root:
 
 ```bash
-# Check status and telemetry
-agent-mock-twin --status
-agent-mock-twin --json
-
-# Ingest network archive or OpenAPI specification
-agent-mock import traffic.har
-agent-mock import openapi_spec.json
-
-# Display token savings and telemetry stats
-agent-mock stats
-
-# Run agent suites with zero token burn
-agent-mock run -- pytest tests/test_agent_workflow.py
-agent-mock run -- python my_autonomous_agent.py
+python3 server.py --host 127.0.0.1 --port 8097
 ```
 
----
-
-## 🌐 Telemetry & REST API
-
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/health` | `GET` | Health check endpoint returning status, version, and route counts. |
-| `/api/stats` | `GET` | Aggregated counters: total hits, tokens saved, USD saved, active routes. |
-| `/api/routes` | `GET` | List all indexed mock routes with method, path, provider, and hit counts. |
-| `/api/hits` | `GET` | Retrieve the last N intercepted requests for the replay log. |
-| `/api/stream` | `GET` | Server-Sent Events (SSE) live feed broadcasting request hits in real time. |
-| `/api/upload` | `POST` | Upload new HAR or OpenAPI blueprints directly via REST. |
-| `/api/config` | `POST` | Adjust base latency simulation, jitter, and chaos injection rates. |
-| `/api/test` | `POST` | Test playground endpoint to simulate mock requests and view responses. |
+Open `http://127.0.0.1:8097` in your browser.
 
 ---
 
-## ☕ 100% Free & Open-Access Support Architecture
+## CLI & ZothOS v3.4.0 Integration
 
-Agent Mock Twin is **100% free, unlocked, and open-access by default**. There are zero paywalls, zero blurred locks, zero license modals, and zero subscription gates.
-
-If you find this utility valuable, support sovereign open-source engineering:
-- **☕ Buy Us a Coffee via Stripe**: [https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
-- **◎ Solana Tip Address**: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`
-
----
-
-## 🔒 Network Exposure & Security
-
-The server binds to `127.0.0.1` by default. To reach it from other devices, opt in explicitly with `--host 0.0.0.0` (or set `ZOTH_BIND_HOST=0.0.0.0`) and only on a trusted network.
-
-Browser requests are only accepted from `localhost` / `127.0.0.1` pages: cross-site POSTs get `403` and CORS never answers `*`, so arbitrary third-party websites cannot drive the local server.
-
----
-
-## 📜 Attribution & License
-
-- **Engineered by**: 1nc0gn30 • NullAI ([@1nc0gn30](https://github.com/1nc0gn30)) • [NullAI Platform](https://nullai.tech)
-- **License**: MIT License
-
----
-
-## 🏛️ ZothOS v3.4, Zoth Studio v2 & Obsidian Second Brain Ecosystem
-
-```mermaid
-flowchart LR
-    subgraph ZothOS["🐧 ZothOS v3.4 CLI & Braille TUI"]
-        CLI["agent-mock-twin --help / --json"]
-        TUI["agent-mock-twin-tui<br/>Unicode U+2800 2x4 Braille"]
-    end
-
-    subgraph Workstation["⚡ Sovereign Workstation"]
-        WEB["http://127.0.0.1:8097<br/>REST API & /health"]
-    end
-
-    subgraph Studio["🌌 Zoth Studio v2 & ZothOS-Lite"]
-        GODMODE["http://127.0.0.1:3000/tools/agent-mock-twin<br/>God-Mode Workstation"]
-        LITE["http://127.0.0.1:8145<br/>ZothOS-Lite Web Desktop"]
-    end
-
-    subgraph SecondBrain["💎 Obsidian Second Brain & STDP"]
-        TRACKER["http://127.0.0.1:8151<br/>Zoth Obsidian Tracker"]
-        NEURO["http://127.0.0.1:8094<br/>Neuro-Memory STDP Cortex"]
-        NOTE["Studio/Tools/Studio agent-mock-twin.md"]
-    end
-
-    CLI --> WEB
-    TUI --> WEB
-    WEB <--> GODMODE
-    WEB <--> LITE
-    WEB --> TRACKER
-    TRACKER <--> NOTE
-    NOTE <--> NEURO
-```
-
-### Cross-Surface Integration Matrix
-
-| Surface | Endpoint / Binary | Capabilities |
-| :--- | :--- | :--- |
-| **Standalone Workstation** | `http://127.0.0.1:8097` | 100% Free & Open-Access Web Deck, live `/health` & REST telemetry |
-| **Zoth Studio v2 Route** | `http://127.0.0.1:3000/tools/agent-mock-twin` | Interactive God-Mode component inside Zoth Studio (`https://zoth.nullai.tech`) |
-| **ZothOS v3.4 CLI & TUI** | `agent-mock-twin` / `agent-mock-twin-tui` | Global binary in `/usr/local/bin/` with Unicode `U+2800` Braille TUI & `--json` output |
-| **ZothOS-Lite Web Desktop** | `http://127.0.0.1:8145` | Browser-native KDE-style window manager & terminal launcher |
-| **Zoth Obsidian Tracker** | `http://127.0.0.1:8151` | Interactive Obsidian Second Brain vault explorer (`~/Documents/Obsidian Vault/Studio/Tools/Studio agent-mock-twin.md`) |
-| **Neuro-Memory STDP Cortex** | `http://127.0.0.1:8094` | 3-Factor STDP synaptic memory daemon & 21-tool MCP server |
+`agent-mock` (`./bin/agent-mock`, `./bin/agent-mock-twin`, and `./bin/agent-mock-twin-tui`) imports specifications, inspects token/USD savings, and wraps agent runs:
 
 ```bash
-# Inspect CLI & Unicode U+2800 Braille TUI on ZothOS v3.4
-agent-mock-twin --help
-agent-mock-twin-tui --status
-agent-mock-twin-tui --json
+# Inspect daemon health and cumulative token/USD savings
+agent-mock --status
+agent-mock --json
+agent-mock stats --port 8097 --json
 
-# Verify Second Brain Vault & 12-Step Verification Gallery on :8151
-zoth-obsidian-tracker --verify
+# Import a HAR 1.2 archive or OpenAPI 3.0 JSON file into agent_mock.db
+agent-mock import path/to/agent-traffic.har
+
+# Execute an agent command redirected to the local mock twin on :8097
+agent-mock run --port 8097 -- python3 my_agent.py
 ```
 
+---
+
+## REST API Reference
+
+Control-plane `POST` routes enforce local-origin CSRF validation (`127.0.0.1`, `localhost`, `[::1]`, or local SDK/CLI clients).
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | Web dashboard (`public/index.html`) |
+| `GET` | `/health`, `/api/health`, `/status` | Service health, active route count, total hits, and saved USD |
+| `GET` | `/api/stats` | Detailed hit counters, saved tokens, provider list, and match-tier breakdown |
+| `GET` | `/api/routes` | List all active mock routes stored in SQLite |
+| `GET` | `/api/hits?limit=50` | Recent intercepted mock requests and match tiers |
+| `GET` | `/api/config` | Current latency, jitter, and chaos injection settings |
+| `GET` | `/api/stream` | Real-time Server-Sent Events (SSE) intercept stream |
+| `POST` | `/api/upload` | Upload HAR 1.2 or OpenAPI 3.0 JSON payload into active mock storage |
+| `POST` | `/api/config` | Dynamically update `base_latency_ms`, `jitter_ms`, or `chaos_rate` |
+| `ANY` | `/v1/chat/completions`, `/v1/messages`, `/v1/embeddings`, `/*` | Deterministic mock replay & LLM twin endpoints |
+
+---
+
+## Testing & Verification
+
+```bash
+PYTHONPATH=src python3 -m pytest -q
+./bin/agent-mock --help
+./bin/agent-mock --json
+```
+
+---
+
+## Support & License
+
+100% free and open-source software under the MIT License.
+
+- Optional support: [Buy Us a Coffee via Stripe](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
+- Engineered by **1nc0gn30** (`@1nc0gn30`, [https://1nc0gn30.si](https://1nc0gn30.si)) • **NullAI** ([https://nullai.tech](https://nullai.tech))
